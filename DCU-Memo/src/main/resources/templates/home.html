@@ -87,14 +87,14 @@
         const memoContainerGrid = document.getElementById('memo-container-grid');
         const isPublicCheckbox = document.querySelector('input[name="checkBox"]');
 
-        // ✅ 로그인 사용자의 모든 메모 불러오기 (최신순)
+        // 최신순으로 로그인 사용자의 모든 메모 불러오기
 async function loadMemos() {
     try {
         const res = await fetch('/api/memos', { method: 'GET', credentials: 'include' });
         if (!res.ok) throw new Error("메모 로딩 실패");
         let memos = await res.json();
 
-        // ✅ modDate 기준으로 내림차순 정렬 (최신 → 오래된)
+        // modDate 기준으로 내림차순 정렬
         memos.sort((a, b) => new Date(b.modDate) - new Date(a.modDate));
 
         memoContainerGrid.innerHTML = '';
@@ -120,7 +120,7 @@ async function loadMemos() {
     }
 }
 
-        // ✅ 메모 등록
+        // 메모 등록
         const addMemo = async () => {
             const title = memoTitle.value.trim();
             const content = memoContent.value.trim();
@@ -141,7 +141,7 @@ async function loadMemos() {
                 });
 
                 if (response.ok) {
-                    await loadMemos(); // ✅ 등록 후 즉시 리스트 새로고침
+                    await loadMemos(); // 등록 후 즉시 리스트 새로고침
                     memoTitle.value = '';
                     memoContent.value = '';
                     isPublicCheckbox.checked = false;
@@ -155,7 +155,7 @@ async function loadMemos() {
         };
         addMemoBtn.addEventListener('click', addMemo);
 
-        // ✅ 메모 삭제
+        // 메모 삭제
         memoContainerGrid.addEventListener('click', async function(e) {
             const deleteButton = e.target.closest('.delete-memo');
             if (deleteButton) {
@@ -180,7 +180,7 @@ async function loadMemos() {
             }
         });
 
-        // ✅ 초기 로드 시 전체 메모 보여주기
+        // 초기 로드 시 전체 메모 보여주기
         await loadMemos();
     });
 </script>
