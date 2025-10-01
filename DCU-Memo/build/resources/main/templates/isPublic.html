@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Shared Memo</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const memoContainer = document.getElementById("shared-memo-container");
+            const paginationContainer = document.getElementById("pagination");
+            let currentPage = 0;
+
+            // ✅ 공개 메모 로드
+            async function loadPublicMemos(page = 0) {
+                try {
+                    // ⚡ size=5 로 변경
+                    const res = await fetch(`/api/memos/public?page=${page}&size=5`);
+                    if (!res.ok) throw new Error("공유 메모 불러오기 실패");
+
+                    const data = await res.json();
+                    const memos = data.content;
+
+                    // --- 메모 출력 ---
+                    memoContainer.innerHTML = "";
+                    memos.forEach(m => {
+                        const item = document.createElement("div");
+                        item.className = "border border-gray-700 rounded-lg p-4 mb-4 bg-card shadow transition hover:border-primary hover:shadow-lg hover:bg-[#2A2A2A]";
+
+                        item.innerHTML = `
+                            <div class="flex justify-between">
+                                <div>
+                                    <h3 class="font-bold text-lg text-primary">${m.title}</h3>
+                                    <p class="text-text mt-2">${m.content.replace(/\n/g, "<br>")}</p>
+                                </div>
+                                <div class="text-right text-sm text-muted">
+                                    <p>${m.name}</p>
+                                    <p>${m.memberEmail}</p>
+                                    <p>${m.modDate ? m.modDate.split("T")[0] : ""}</p>
+                                </div>
+                            </div>
+                        `;
+                        memoContainer.appendChild(item);
+                    });
+
+                    // --- 페이지네이션 출력 ---
+                    renderPagination(data.totalPages, data.number);
+                } catch (err) {
+                    console.error(err);
+                    memoContainer.innerHTML = "<p class='text-red-500'>메모를 불러오는 중 오류 발생</p>";
+                }
+            }
+
+            function renderPagination(totalPages, currentPage) {
+                paginationContainer.innerHTML = "";
+                if (totalPages <= 1) return;
+
+                const maxPagesToShow = 5;
+                const currentGroup = Math.floor(currentPage / maxPagesToShow);
+                const startPage = currentGroup * maxPagesToShow;
+                const endPage = Math.min(startPage + maxPagesToShow, totalPages);
+
+                // ◀ 이전 그룹
+                if (startPage > 0) {
+                    const prevBtn = document.createElement("button");
+                    prevBtn.innerHTML = "◀";
+                    prevBtn.className = "px-3 py-1 rounded-full bg-black text-white border border-gray-600 hover:bg-primary hover:text-black transition";
+                    prevBtn.addEventListener("click", () => loadPublicMemos(startPage - 1));
+                    paginationContainer.appendChild(prevBtn);
+                }
+
+                // 페이지 번호
+                for (let i = startPage; i < endPage; i++) {
+                    const btn = document.createElement("button");
+                    btn.textContent = i + 1;
+
+                    if (i === currentPage) {
+                        // ✅ 현재 페이지: 노랑 배경 + 흰 글씨
+                        btn.className = "px-3 py-1 rounded-full font-bold text-white bg-primary border border-primary";
+                    } else {
+                        btn.className = "px-3 py-1 rounded-full bg-black text-white border border-gray-600 hover:bg-primary hover:text-black transition";
+                    }
+
+                    btn.addEventListener("click", () => loadPublicMemos(i));
+                    paginationContainer.appendChild(btn);
+                }
+
+                // ▶ 다음 그룹
+                if (endPage < totalPages) {
+                    const nextBtn = document.createElement("button");
+                    nextBtn.innerHTML = "▶";
+                    nextBtn.className = "px-3 py-1 rounded-full bg-black text-white border border-gray-600 hover:bg-primary hover:text-black transition";
+                    nextBtn.addEventListener("click", () => loadPublicMemos(endPage));
+                    paginationContainer.appendChild(nextBtn);
+                }
+            }
+
+            loadPublicMemos(currentPage);
+        });
+    </script>
+
+    <style>
+        body { font-family: "Noto Sans KR", sans-serif; background-color: #111111; color: #F9FAFB; }
+        h1 { font-family: "Isamanru", serif; }
+        .bg-card { background-color: #1E1E1E; }
+        .text-primary { color: #FACC15; }
+        .border-primary { border-color: #FACC15; }
+        .hover\:shadow-lg:hover { box-shadow: 0 4px 10px rgba(250, 204, 21, 0.3); }
+    </style>
+</head>
+<body class="font-display">
+<div class="container mx-auto p-4">
+    <header class="flex justify-center items-center py-2 mb-5 border-b border-gray-700">
+        <h1 class="text-2xl font-bold text-primary">DCU Memo</h1>
+    </header>
+
+    <main>
+        <div class="bg-card p-10 rounded-lg shadow-md border border-gray-700">
+            <!-- ✅ 공개 메모 출력 영역 -->
+            <div id="shared-memo-container" class="space-y-6"></div>
+            <!-- ✅ 페이지네이션 영역 -->
+            <div id="pagination" class="flex justify-center mt-8 space-x-2"></div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

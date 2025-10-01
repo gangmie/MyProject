@@ -1,0 +1,9 @@
+# Java/Gradle/Spring ignores
+/build/
+/out/
+/target/
+.gradle/
+.idea/
+*.iml
+*.log
+.DS_Store
