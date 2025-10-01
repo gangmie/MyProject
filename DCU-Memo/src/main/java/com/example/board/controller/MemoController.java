@@ -6,7 +6,7 @@ import com.example.board.entity.Memo;
 import com.example.board.service.MemoService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;   // ✅ Page 는 사용됨
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +20,7 @@ public class MemoController {
         this.memoService = memoService;
     }
 
-    // ✅ 메모 등록
+    // 메모 등록
     @PostMapping("/api/memos")
     public ResponseEntity<?> saveMemo(@Valid @RequestBody MemoRequestDTO requestDTO, HttpSession session) {
         MemberDTO member = (MemberDTO) session.getAttribute("member");
@@ -54,7 +54,7 @@ public class MemoController {
         return ResponseEntity.ok(memoService.findPublicMemos(page, size));
     }
 
-    // ✅ 메모 삭제
+    // 메모 삭제
     @DeleteMapping("/api/memos/{id}")
     public ResponseEntity<?> deleteMemo(@PathVariable Long id, HttpSession session) {
         MemberDTO member = (MemberDTO) session.getAttribute("member");
