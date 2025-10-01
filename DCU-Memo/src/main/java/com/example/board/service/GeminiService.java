@@ -14,7 +14,6 @@ public class GeminiService {
     private final String apiKey;
     private final String apiUrl;
 
-    // application.properties에서 설정값을 주입받습니다.
     public GeminiService(WebClient.Builder webClientBuilder,
                          @Value("${gemini.api.key}") String apiKey,
                          @Value("${gemini.api.url}") String apiUrl) {
@@ -22,12 +21,6 @@ public class GeminiService {
         this.apiKey = apiKey;
         this.apiUrl = apiUrl;
     }
-
-    /**
-     * Gemini API에 프롬프트를 보내고 응답 텍스트를 받아옵니다.
-     * @param prompt 사용자 질문
-     * @return Gemini 응답 텍스트
-     */
     public Mono<String> getCompletion(String prompt) {
         // API 요청 본문 생성
         GeminiRequestDTO.Part part = new GeminiRequestDTO.Part(prompt);
